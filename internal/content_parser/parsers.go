@@ -1,5 +1,5 @@
 package content_parser
 
-import "internal/format_parser"
+import "internal/persistent_storage"
 
-var content_parsers = [...]func(format_parser.ParsedFile) error{ctagsParse}
+var content_parsers = [...]func(persistent_storage.ParsedFile) error{ctagsParse}

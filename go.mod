@@ -1,4 +1,4 @@
-module example/hello
+module newgrok
 
 go 1.18
 
@@ -12,6 +12,16 @@ replace internal/format_parser => ./internal/format_parser
 
 require internal/content_parser v0.0.0-00010101000000-000000000000
 
-require github.com/sourcegraph/go-ctags v0.0.0-20220611154803-db463692f037 // indirect
-
 replace internal/content_parser => ./internal/content_parser
+
+require internal/persistent_storage v0.0.0-00010101000000-000000000000
+
+replace internal/persistent_storage => ./internal/persistent_storage
+
+require (
+	github.com/gocql/gocql v1.2.0 // indirect
+	github.com/golang/snappy v0.0.3 // indirect
+	github.com/hailocab/go-hostpool v0.0.0-20160125115350-e80d13ce29ed // indirect
+	github.com/sourcegraph/go-ctags v0.0.0-20220611154803-db463692f037 // indirect
+	gopkg.in/inf.v0 v0.9.1 // indirect
+)

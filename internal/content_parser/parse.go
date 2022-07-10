@@ -1,11 +1,11 @@
 package content_parser
 
 import (
-	"internal/format_parser"
+	"internal/persistent_storage"
 	"log"
 )
 
-func worker(contents chan format_parser.ParsedFile, done chan int) {
+func worker(contents chan persistent_storage.ParsedFile, done chan int) {
 	for i := range contents {
 		for _, content_parser := range content_parsers {
 			err := content_parser(i)
@@ -18,7 +18,7 @@ func worker(contents chan format_parser.ParsedFile, done chan int) {
 	done <- 1
 }
 
-func Parse(contents chan format_parser.ParsedFile, workerCount int, done chan int) {
+func Parse(contents chan persistent_storage.ParsedFile, workerCount int, done chan int) {
 	myDone := make(chan int, workerCount)
 
 	for w := 0; w < workerCount; w++ {

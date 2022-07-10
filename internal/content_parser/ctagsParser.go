@@ -1,14 +1,14 @@
 package content_parser
 
 import (
-	"internal/format_parser"
+	"internal/persistent_storage"
 	"log"
 	"regexp"
 
 	ctags "github.com/sourcegraph/go-ctags"
 )
 
-func ctagsParse(file format_parser.ParsedFile) error {
+func ctagsParse(file persistent_storage.ParsedFile) error {
 	p, err := ctags.New(ctags.Options{
 		Bin: "ctags",
 	})

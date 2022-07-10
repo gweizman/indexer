@@ -1,8 +1,8 @@
 package content_parser
 
-import "internal/format_parser"
+import "internal/persistent_storage"
 
-func stringsParse(file format_parser.ParsedFile) error {
+func stringsParse(file persistent_storage.ParsedFile) error {
 	//fmt.Println(file.Path)
 	return nil
 }

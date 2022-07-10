@@ -4,13 +4,14 @@ import (
 	"internal/content_parser"
 	"internal/crawler"
 	"internal/format_parser"
+	"internal/persistent_storage"
 	"log"
 	"time"
 )
 
 func addProject(dir string, name string) {
 	files := make(chan string, 3000)
-	contents := make(chan format_parser.ParsedFile, 3000)
+	contents := make(chan persistent_storage.ParsedFile, 3000)
 	done := make(chan int)
 
 	go crawler.Crawl(dir, files)

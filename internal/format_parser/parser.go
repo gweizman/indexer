@@ -2,18 +2,13 @@ package format_parser
 
 import (
 	"bytes"
+	"internal/persistent_storage"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
 	"path/filepath"
 )
-
-type ParsedFile struct {
-	Path   string
-	Plain  []byte
-	Parsed []byte
-}
 
 func tika(filename string, content []byte) []byte {
 	req, err := http.NewRequest("PUT", "http://localhost:9998/tika/", bytes.NewBuffer(content))
@@ -41,7 +36,7 @@ func tika(filename string, content []byte) []byte {
 	return body
 }
 
-func worker(files chan string, results chan ParsedFile, done chan int) {
+func worker(files chan string, results chan persistent_storage.ParsedFile, done chan int) {
 	for file_name := range files {
 		func() {
 			file, err := os.Open(file_name)
@@ -57,7 +52,7 @@ func worker(files chan string, results chan ParsedFile, done chan int) {
 				return
 			}
 
-			results <- ParsedFile{
+			results <- persistent_storage.ParsedFile{
 				file_name,
 				[]byte(content),
 				tika(filepath.Base(file_name), content),
@@ -68,7 +63,7 @@ func worker(files chan string, results chan ParsedFile, done chan int) {
 	done <- 1
 }
 
-func Parse(files chan string, contents chan ParsedFile, workerCount int) {
+func Parse(files chan string, contents chan persistent_storage.ParsedFile, workerCount int) {
 	done := make(chan int, workerCount)
 
 	for w := 0; w < workerCount; w++ {
