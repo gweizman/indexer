@@ -10,13 +10,18 @@ import (
 )
 
 func addProject(dir string, name string) {
-	files := make(chan string, 3000)
-	contents := make(chan persistent_storage.ParsedFile, 3000)
+	storage, err := persistent_storage.NewStorage(name, dir)
+	if err != nil {
+		log.Panic("Failed creating storage")
+	}
+
+	files_names := make(chan string, 3000)
+	files := make(chan persistent_storage.StoredFile, 3000)
 	done := make(chan int)
 
-	go crawler.Crawl(dir, files)
-	go format_parser.Parse(files, contents, 100)
-	go content_parser.Parse(contents, 100, done)
+	go crawler.Crawl(dir, files_names)
+	go format_parser.Parse(storage, files_names, files, 100)
+	go content_parser.Parse(storage, files, 100, done)
 
 	<-done
 }
@@ -24,7 +29,7 @@ func addProject(dir string, name string) {
 func main() {
 	start := time.Now()
 
-	addProject("D:\\Work\\hellogitworld", "hello")
+	addProject("D:\\Work\\test", "hello")
 
 	elapsed := time.Since(start)
 	log.Printf("took %s", elapsed)

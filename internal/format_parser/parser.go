@@ -36,9 +36,14 @@ func tika(filename string, content []byte) []byte {
 	return body
 }
 
-func worker(files chan string, results chan persistent_storage.ParsedFile, done chan int) {
+func worker(storage *persistent_storage.IndexStorage, files chan string, results chan persistent_storage.StoredFile, done chan int) {
 	for file_name := range files {
 		func() {
+			fileObject, err := storage.CreateFile(file_name)
+			if err != nil {
+				log.Panic("Failed creating file object")
+			}
+
 			file, err := os.Open(file_name)
 			if err != nil {
 				log.Println(err)
@@ -52,22 +57,21 @@ func worker(files chan string, results chan persistent_storage.ParsedFile, done 
 				return
 			}
 
-			results <- persistent_storage.ParsedFile{
-				file_name,
-				[]byte(content),
-				tika(filepath.Base(file_name), content),
-			}
+			fileObject.AddContent(content)
+			fileObject.AddContentVersion(tika(filepath.Base(file_name), content), "Tika")
+
+			results <- fileObject
 		}()
 	}
 
 	done <- 1
 }
 
-func Parse(files chan string, contents chan persistent_storage.ParsedFile, workerCount int) {
+func Parse(storage *persistent_storage.IndexStorage, files chan string, contents chan persistent_storage.StoredFile, workerCount int) {
 	done := make(chan int, workerCount)
 
 	for w := 0; w < workerCount; w++ {
-		go worker(files, contents, done)
+		go worker(storage, files, contents, done)
 	}
 
 	for j := 0; j < workerCount; j++ {

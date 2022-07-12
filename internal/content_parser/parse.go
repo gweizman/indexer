@@ -5,12 +5,17 @@ import (
 	"log"
 )
 
-func worker(contents chan persistent_storage.ParsedFile, done chan int) {
-	for i := range contents {
-		for _, content_parser := range content_parsers {
-			err := content_parser(i)
-			if err != nil {
-				log.Print(err)
+func worker(contents chan persistent_storage.StoredFile, done chan int) {
+	for file := range contents {
+		for _, content := range file.Content {
+			data, canBeCode := content.Data, content.CanBeCode
+			if canBeCode {
+				for _, content_parser := range content_parsers {
+					err := content_parser(file, data)
+					if err != nil {
+						log.Print(err)
+					}
+				}
 			}
 		}
 	}
@@ -18,7 +23,7 @@ func worker(contents chan persistent_storage.ParsedFile, done chan int) {
 	done <- 1
 }
 
-func Parse(contents chan persistent_storage.ParsedFile, workerCount int, done chan int) {
+func Parse(storage *persistent_storage.IndexStorage, contents chan persistent_storage.StoredFile, workerCount int, done chan int) {
 	myDone := make(chan int, workerCount)
 
 	for w := 0; w < workerCount; w++ {

@@ -2,13 +2,12 @@ package content_parser
 
 import (
 	"internal/persistent_storage"
-	"log"
 	"regexp"
 
 	ctags "github.com/sourcegraph/go-ctags"
 )
 
-func ctagsParse(file persistent_storage.ParsedFile) error {
+func ctagsParse(file persistent_storage.StoredFile, content []byte) error {
 	p, err := ctags.New(ctags.Options{
 		Bin: "ctags",
 	})
@@ -18,14 +17,14 @@ func ctagsParse(file persistent_storage.ParsedFile) error {
 	}
 
 	re := regexp.MustCompile(`\r?\n`)
-	better_content := re.ReplaceAllString(string(file.Parsed), "\n")
+	better_content := re.ReplaceAllString(string(content), "\n")
 
-	got, err := p.Parse(file.Path, []byte(better_content))
+	got, err := p.Parse(file.Name, []byte(better_content))
 	if err != nil {
 		return err
 	}
 	for _, g := range got {
-		log.Println(g)
+		file.InsertDefinition(g.Name, g.Line, g.Kind, g.Language, g.Parent, g.ParentKind, g.Pattern, g.Signature, g.FileLimited)
 	}
 
 	return nil
