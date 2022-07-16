@@ -1,0 +1,33 @@
+version: '3.9'
+
+services:
+  tika:
+    image: apache/tika:latest
+    container_name: tika
+    restart: on-failure
+    ports:
+      - "9998:9998"
+  solr:
+    image: solr:latest
+    container_name: solr
+    restart: on-failure
+    ports:
+      - "8983:8983"
+    # volumes:
+    #   - data:/opt/solr/server/solr/mycores
+    entrypoint:
+      - docker-entrypoint.sh
+      - solr
+      - start
+      - -c
+      - -f
+  neo4j:
+    image: neo4j:latest
+    container_name: neo4j
+    environment:
+      - NEO4J_AUTH=neo4j/password
+    ports:
+      - 7474:7474
+      - 7687:7687
+volumes:
+  data:

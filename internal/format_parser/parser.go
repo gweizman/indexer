@@ -7,8 +7,14 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"path/filepath"
 )
+
+var tika_extensions = [...]string{"pdf"}
+var plain_extensions = [...]string{"txt", "java", "", "c", "cpp"}
+
+func isBinary(content []byte) bool {
+	return false
+}
 
 func tika(filename string, content []byte) []byte {
 	req, err := http.NewRequest("PUT", "http://localhost:9998/tika/", bytes.NewBuffer(content))
@@ -41,7 +47,7 @@ func worker(storage *persistent_storage.IndexStorage, files chan string, results
 		func() {
 			fileObject, err := storage.CreateFile(file_name)
 			if err != nil {
-				log.Panic("Failed creating file object")
+				log.Panic(err)
 			}
 
 			file, err := os.Open(file_name)
@@ -57,8 +63,8 @@ func worker(storage *persistent_storage.IndexStorage, files chan string, results
 				return
 			}
 
-			fileObject.AddContent(content)
-			fileObject.AddContentVersion(tika(filepath.Base(file_name), content), "Tika")
+			//fileObject.AddContent(content)
+			fileObject.AddContentVersion(tika(file_name, content), "original")
 
 			results <- fileObject
 		}()

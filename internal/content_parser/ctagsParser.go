@@ -2,6 +2,7 @@ package content_parser
 
 import (
 	"internal/persistent_storage"
+	"log"
 	"regexp"
 
 	ctags "github.com/sourcegraph/go-ctags"
@@ -24,7 +25,10 @@ func ctagsParse(file persistent_storage.StoredFile, content []byte) error {
 		return err
 	}
 	for _, g := range got {
-		file.InsertDefinition(g.Name, g.Line, g.Kind, g.Language, g.Parent, g.ParentKind, g.Pattern, g.Signature, g.FileLimited)
+		err := file.InsertDefinition(g.Name, g.Line, g.Kind, g.Language, g.Parent, g.ParentKind, g.Pattern, g.Signature, g.FileLimited)
+		if err != nil {
+			log.Panic(err)
+		}
 	}
 
 	return nil

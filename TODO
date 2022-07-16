@@ -1,8 +1,13 @@
+- Find a name for the project
 - Figure out the correct way to deal with errors (log.Fatal seems wrong, ignoring seems worse?)
-- Make sure tika and cassandra are functional before setting everything up
+- Also save original file version (pre-tika) to some kind of object storage for displaying (instead of displaying the parsed version from the db)
+    - Actualy just saving tika output for now. Add a parser for other binary files (strings.exe maybe?)
 - Add pre-calculated alternate versions
-    - Lexed using Pygments
+    - Lexed using Pygments - currently doing on-the-fly in GUI, can pre-calculate
     - Translated using Tika or http://rtg.isi.edu/many-eng/
+- Figure out db kinks
+    - neo4j and solr are both built on lucene. Is a full text search in neo4j good enough or is solr really needed?
 - Build a GUI obviously
-    - Full text search with regex, great ideas @ https://github.com/sourcegraph/zoekt/blob/master/doc/design.md
+    - Also an API wrapper for neo4j
 - Pygments, Tika, etc., should be wrapped with gRPC and treated like micro-services instead of running a binary for each
+- Add volumes to docker-compose (although having the data erase itself is good for now)
