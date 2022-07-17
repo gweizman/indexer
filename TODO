@@ -11,3 +11,5 @@
     - Also an API wrapper for neo4j
 - Pygments, Tika, etc., should be wrapped with gRPC and treated like micro-services instead of running a binary for each
 - Add volumes to docker-compose (although having the data erase itself is good for now)
+- Make sure project names can't contain commas
+- Pass a context to chi so db isn't made for every request

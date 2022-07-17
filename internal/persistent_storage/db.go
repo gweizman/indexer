@@ -3,6 +3,7 @@ package persistent_storage
 import (
 	"context"
 	"log"
+	"path/filepath"
 
 	"github.com/neo4j/neo4j-go-driver/v4/neo4j"
 	"github.com/pkg/errors"
@@ -194,4 +195,31 @@ func (e *Db) InitSchemas() error {
 	}
 
 	return nil
+}
+
+func (e *Db) GetFileContent(project string, path string) (string, bool, error) {
+	session := e.neo4jDriver.NewSession(neo4j.SessionConfig{AccessMode: neo4j.AccessModeWrite})
+	defer session.Close()
+
+	dir, file := filepath.Split(path)
+	dir, err := filepath.Rel("./", dir)
+	if err != nil {
+		log.Panic(err)
+	}
+
+	log.Print(dir)
+	log.Print(file)
+	output, err := session.Run("MATCH (f:File)-[:CONTENT]->(c:Content) WHERE f.project = $project AND f.path = $path AND f.name = $name RETURN c.data AS data",
+		map[string]interface{}{"project": project, "path": filepath.Dir(path), "name": file, "dir": dir}) // TODO: Figure out how to include project in this index
+	if err != nil {
+		return "", false, err
+	}
+	if output.Next() {
+		content, found := output.Record().Get("data")
+		if found {
+			return content.(string), found, nil
+		}
+	}
+
+	return "", false, nil
 }
