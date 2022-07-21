@@ -224,6 +224,54 @@ func (e *Db) GetFileContent(project string, path string) (string, bool, error) {
 	return "", false, nil
 }
 
+type FileContent struct {
+	Project  string  `json:"project"`
+	Version  string  `json:"version"`
+	FileName string  `json:"file_name"`
+	FilePath string  `json:"file_path"`
+	Data     string  `json:"data"`
+	Score    float64 `json:"score"`
+}
+
+// TODO: Don't ignore path_limit
+// TODO: Maybe should be the same function as GetFileContent
+func (e *Db) SearchFileContent(project string, path_limit string, query string) ([]FileContent, bool, error) {
+	session := e.neo4jDriver.NewSession(neo4j.SessionConfig{AccessMode: neo4j.AccessModeWrite})
+	defer session.Close()
+	output, err := session.Run(""+
+		"CALL db.index.fulltext.queryNodes(\"content_project_idx\", $query) YIELD node, score "+
+		"MATCH (f:File) "+
+		"WHERE (f:File)-[:CONTENT]->(node) AND node.project = $project AND f.project = $project "+
+		"RETURN node.data as data, node.project as project, node.version as version, f.name as fileName, f.path as filePath, score as score",
+		map[string]interface{}{"project": project, "query": query})
+	if err != nil {
+		return []FileContent{}, false, err
+	}
+
+	var results []FileContent
+	for output.Next() {
+		record := output.Record()
+
+		project, _ := record.Get("project")
+		version, _ := record.Get("version")
+		fileName, _ := record.Get("fileName")
+		filePath, _ := record.Get("filePath")
+		data, _ := record.Get("data")
+		score, _ := record.Get("score")
+
+		results = append(results, FileContent{
+			Project:  project.(string),
+			Version:  version.(string),
+			FileName: fileName.(string),
+			FilePath: filePath.(string),
+			Data:     data.(string),
+			Score:    score.(float64),
+		})
+	}
+
+	return results, true, nil
+}
+
 type Definition struct {
 	Project     string `json:"project"`
 	Name        string `json:"name"`

@@ -7,10 +7,10 @@ import (
 	"github.com/neo4j/neo4j-go-driver/v4/neo4j"
 )
 
-type FileContent struct {
-	Data      []byte
-	CanBeCode bool
-}
+// type FileContent struct {
+// 	Data      []byte
+// 	CanBeCode bool
+// }
 
 type IndexStorage struct {
 	db       Db
@@ -118,10 +118,10 @@ func (f *StoredFile) AddContentVersion(content []byte, version string) error {
 	}
 	log.Printf("%s %s %s", f.Path, f.Name, content_to_print)
 
-	f.Content[version] = FileContent{
-		Data:      content,
-		CanBeCode: true,
-	}
+	// f.Content[version] = FileContent{
+	// 	Data:      content,
+	// 	CanBeCode: true,
+	// }
 
 	_, err := session.Run(""+
 		"MATCH (f:File) "+

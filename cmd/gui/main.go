@@ -30,7 +30,15 @@ type DefinitionResponse struct {
 	*persistent_storage.Definition
 }
 
+type SearchResponse struct {
+	*persistent_storage.FileContent
+}
+
 func (k *DefinitionResponse) Render(w http.ResponseWriter, r *http.Request) error {
+	return nil
+}
+
+func (k *SearchResponse) Render(w http.ResponseWriter, r *http.Request) error {
 	return nil
 }
 
@@ -54,7 +62,22 @@ func getDef(w http.ResponseWriter, r *http.Request, project string, path_limit s
 }
 
 func textSearch(w http.ResponseWriter, r *http.Request, project string, path_limit string, db *persistent_storage.Db) {
+	t, found, err := db.SearchFileContent(project, path_limit, r.URL.Query().Get("query"))
+	if err != nil {
+		log.Panic(err)
+	}
 
+	if !found {
+		http.Error(w, http.StatusText(404), 404)
+		return
+	}
+
+	list := []render.Renderer{}
+	for _, val := range t {
+		list = append(list, &SearchResponse{FileContent: &val})
+	}
+
+	render.RenderList(w, r, list)
 }
 
 func apiHandler(w http.ResponseWriter, r *http.Request) {
@@ -74,7 +97,7 @@ func apiHandler(w http.ResponseWriter, r *http.Request) {
 	case "definition":
 		getDef(w, r, project, file, db)
 		return
-	case "text":
+	case "search":
 		textSearch(w, r, project, file, db)
 		return
 	default:
