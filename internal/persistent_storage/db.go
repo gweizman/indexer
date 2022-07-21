@@ -223,3 +223,62 @@ func (e *Db) GetFileContent(project string, path string) (string, bool, error) {
 
 	return "", false, nil
 }
+
+type Definition struct {
+	Project     string `json:"project"`
+	Name        string `json:"name"`
+	Language    string `json:"language"`
+	Pattern     string `json:"pattern"`
+	Signature   string `json:"signature"`
+	FileLimited bool   `json:"file_limited"`
+	Parent      string `json:"parent"`
+	ParentKind  string `json:"parent_kind"`
+	FileName    string `json:"file_name"`
+	FilePath    string `json:"file_path"`
+	Line        uint   `json:"line"`
+}
+
+func (e *Db) GetDefinition(project string, path_limit string, name string) ([]Definition, bool, error) { // TODO: Don't ignore path_limit
+	session := e.neo4jDriver.NewSession(neo4j.SessionConfig{AccessMode: neo4j.AccessModeWrite})
+	defer session.Close()
+
+	output, err := session.Run("MATCH (n:Definition)<-[:DEFINES]-(f:File) WHERE n.project = $project AND n.name = $name RETURN n.project as project, n.name as name, "+
+		"n.language as language, n.pattern as pattern, n.signature as signature, n.fileLimited as fileLimited, n.parent as parent, n.parentKind as parentKind, n.line as line, f.name as fileName, f.path as filePath",
+		map[string]interface{}{"project": project, "name": name})
+	if err != nil {
+		return []Definition{}, false, err
+	}
+
+	var results []Definition
+	for output.Next() {
+		record := output.Record()
+
+		project, _ := record.Get("project")
+		name, _ := record.Get("name")
+		language, _ := record.Get("language")
+		pattern, _ := record.Get("pattern")
+		signature, _ := record.Get("signature")
+		fileLimited, _ := record.Get("fileLimited")
+		parent, _ := record.Get("parent")
+		parentKind, _ := record.Get("parentKind")
+		fileName, _ := record.Get("fileName")
+		filePath, _ := record.Get("filePath")
+		line, _ := record.Get("line")
+
+		results = append(results, Definition{
+			Project:     project.(string),
+			Name:        name.(string),
+			Language:    language.(string),
+			Pattern:     pattern.(string),
+			Signature:   signature.(string),
+			FileLimited: fileLimited.(bool),
+			Parent:      parent.(string),
+			ParentKind:  parentKind.(string),
+			FileName:    fileName.(string),
+			FilePath:    filePath.(string),
+			Line:        uint(line.(int64)), // TODO: Fix, should be unsigned @ db
+		})
+	}
+
+	return results, true, nil
+}

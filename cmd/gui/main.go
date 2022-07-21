@@ -9,6 +9,7 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/go-chi/render"
 )
 
 func getFile(w http.ResponseWriter, r *http.Request, project string, file string, db *persistent_storage.Db) {
@@ -25,8 +26,38 @@ func getFile(w http.ResponseWriter, r *http.Request, project string, file string
 	w.Write([]byte(t))
 }
 
+type DefinitionResponse struct {
+	*persistent_storage.Definition
+}
+
+func (k *DefinitionResponse) Render(w http.ResponseWriter, r *http.Request) error {
+	return nil
+}
+
+func getDef(w http.ResponseWriter, r *http.Request, project string, path_limit string, db *persistent_storage.Db) {
+	t, found, err := db.GetDefinition(project, path_limit, r.URL.Query().Get("name"))
+	if err != nil {
+		log.Panic(err)
+	}
+
+	if !found {
+		http.Error(w, http.StatusText(404), 404)
+		return
+	}
+
+	list := []render.Renderer{}
+	for _, def := range t {
+		list = append(list, &DefinitionResponse{Definition: &def})
+	}
+
+	render.RenderList(w, r, list)
+}
+
+func textSearch(w http.ResponseWriter, r *http.Request, project string, path_limit string, db *persistent_storage.Db) {
+
+}
+
 func apiHandler(w http.ResponseWriter, r *http.Request) {
-	log.Print("a")
 	db, err := persistent_storage.CreateDb()
 	if err != nil {
 		log.Panic(err)
@@ -38,14 +69,14 @@ func apiHandler(w http.ResponseWriter, r *http.Request) {
 
 	switch strings.ToLower(action) {
 	case "file":
-	case "get":
-	case "content": // TODO: Decide what the canonical name should be
 		getFile(w, r, project, file, db)
 		return
 	case "definition":
-		// TODO: do
+		getDef(w, r, project, file, db)
+		return
 	case "text":
-		// TODO: do
+		textSearch(w, r, project, file, db)
+		return
 	default:
 		http.Error(w, http.StatusText(404), 404)
 		return
@@ -59,6 +90,7 @@ func main() {
 	r.Use(middleware.RealIP)
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
+	r.Use(render.SetContentType(render.ContentTypeJSON))
 
 	r.Use(middleware.Timeout(60 * time.Second))
 

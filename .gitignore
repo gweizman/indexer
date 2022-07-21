@@ -24,3 +24,4 @@ vendor
 api
 
 .vscode/
+neo4j_data/

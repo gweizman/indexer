@@ -20,6 +20,7 @@ replace internal/persistent_storage => ./internal/persistent_storage
 
 require (
 	github.com/go-chi/chi/v5 v5.0.7 // indirect
+	github.com/go-chi/render v1.0.1 // indirect
 	github.com/gocql/gocql v1.2.0 // indirect
 	github.com/golang/snappy v0.0.3 // indirect
 	github.com/hailocab/go-hostpool v0.0.0-20160125115350-e80d13ce29ed // indirect
