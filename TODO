@@ -5,11 +5,9 @@
 - Add pre-calculated alternate versions
     - Lexed using Pygments - currently doing on-the-fly in GUI, can pre-calculate
     - Translated using Tika or http://rtg.isi.edu/many-eng/
-- Figure out db kinks
-    - neo4j and solr are both built on lucene. Is a full text search in neo4j good enough or is solr really needed?
 - Build a GUI obviously
-    - Also an API wrapper for neo4j
 - Pygments, Tika, etc., should be wrapped with gRPC and treated like micro-services instead of running a binary for each
 - Add volumes to docker-compose (although having the data erase itself is good for now)
 - Make sure project names can't contain commas
 - Pass a context to chi so db isn't made for every request
+- Change most of these to github issues
