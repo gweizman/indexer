@@ -46,7 +46,7 @@ function SymbolList(props) {
   if (isLoading) return 'Loading...'
   if (error) return 'An error has occurred: ' + error.message
   return (
-      <div style={{height: "100%"}}>
+      <div className="symbolResults">
         {data.map((object, i) => <Symbol object={object} />)}
       </div>
   )

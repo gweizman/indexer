@@ -6,3 +6,13 @@ span.small {
     color: white !important; 
     font-weight: normal !important;
 }
+
+.SymbolBrowser {
+    height: calc(100%-50px);
+    overflow-y: auto;
+}
+
+.symbolResults {
+    height: 100%;
+    padding-left: 5px;
+}
