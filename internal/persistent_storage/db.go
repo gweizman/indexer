@@ -290,7 +290,7 @@ func (e *Db) GetDefinition(project string, path_limit string, name string) ([]De
 	session := e.neo4jDriver.NewSession(neo4j.SessionConfig{AccessMode: neo4j.AccessModeWrite})
 	defer session.Close()
 
-	output, err := session.Run("MATCH (n:Definition)<-[:DEFINES]-(f:File) WHERE n.project = $project AND n.name = $name RETURN n.project as project, n.name as name, "+
+	output, err := session.Run("MATCH (n:Definition)<-[:DEFINES]-(f:File) WHERE n.project = $project AND n.name =~ $name RETURN n.project as project, n.name as name, "+
 		"n.language as language, n.pattern as pattern, n.signature as signature, n.fileLimited as fileLimited, n.parent as parent, n.parentKind as parentKind, n.line as line, f.name as fileName, f.path as filePath",
 		map[string]interface{}{"project": project, "name": name})
 	if err != nil {

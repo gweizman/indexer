@@ -8,16 +8,21 @@
 
 .fileTreeWrapper {
     flex: 15%;
+    width: 15%;
     background-color: rgba(255, 255, 255, 0.1);
 }
 
 .filePreviewWrapper {
     flex: 70%;
+    width: 70%;
     max-height: 100%;
     overflow-y: auto;
 }
 
 .symbolsWrapper {
     flex: 15%;
+    width: 15%;
     background-color: rgba(255, 255, 255, 0.1);
+    max-height: 100%;
+    overflow-y: auto;
 }
