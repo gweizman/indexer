@@ -1,0 +1,23 @@
+.columns {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    width: 100%;
+    height: 100%;
+}
+
+.fileTreeWrapper {
+    flex: 15%;
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.filePreviewWrapper {
+    flex: 70%;
+    max-height: 100%;
+    overflow-y: auto;
+}
+
+.symbolsWrapper {
+    flex: 15%;
+    background-color: rgba(255, 255, 255, 0.1);
+}

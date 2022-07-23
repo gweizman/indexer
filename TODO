@@ -10,4 +10,6 @@
 - Add volumes to docker-compose (although having the data erase itself is good for now)
 - Make sure project names can't contain commas
 - Pass a context to chi so db isn't made for every request
+- Search is 100% broken. Results are never what I expect them to be.
 - Change most of these to github issues
+- Change favicon
