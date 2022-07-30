@@ -55,7 +55,7 @@ function TreeFile(props) {
           e.preventDefault();
     }
 
-    const selected = isSubPath(utils.buildPath(props.path, props.name), props.current, true);
+    const selected = isSubPath(props.path === "." ? props.name : utils.buildPath(props.path, props.name), props.current, true); // TODO: Ugly hack
 
     return (
         <div className={"tree-item " + (selected ? "selected" : "")} onClick={handleClick}>
@@ -74,7 +74,6 @@ function TreeChildren(props) {
     )
     if (isLoading) return 'Loading...'
     if (error) return 'An error has occurred: ' + error.message
-    console.log(props.parent)
 
     data = data.sort((a, b) => {
         if (a.is_dir && !b.is_dir) {

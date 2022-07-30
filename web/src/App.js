@@ -15,7 +15,7 @@ function App() {
     <BrowserRouter>
       <div className="App">
         <header>
-          <Link to="/">🔍 Monocole</Link>
+          <Link to="/"><img src="/monocle.svg" height="12px" /> Monocle</Link>
           <div className="divider"></div>
           Some slogan
         </header>

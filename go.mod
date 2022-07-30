@@ -1,4 +1,4 @@
-module monocole
+module monocle
 
 go 1.18
 
