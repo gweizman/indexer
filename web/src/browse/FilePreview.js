@@ -1,6 +1,32 @@
 import { QueryClient, QueryClientProvider, useQuery } from '@tanstack/react-query'
 import MonacoEditor from 'react-monaco-editor';
-import { useEffect, useRef } from 'react';
+
+function GuessLanguage(name) {
+  const fileExt = name.toLowerCase().split('.').pop();
+  console.log(fileExt)
+  switch (fileExt) {
+    case "css":
+      return "css"
+    case "java":
+      return "java"
+    case "c":
+    case "h":
+      return "c"
+    case "cpp":
+    case "hpp":
+    case "cxx":
+    case "hxx":
+      return "cpp"
+    case "md":
+      return "markdown"
+    case "cmd":
+      return "bat"
+    case "py":
+      return "python"
+    default:
+      return fileExt
+  }
+}
 
 function FilePreview(props) {
   let { isLoading, error, data } = useQuery(['searchResults', props.project, props.file], () =>
@@ -14,7 +40,7 @@ function FilePreview(props) {
   return (
       <div style={{height: "100%"}}>
         <MonacoEditor
-          language="java"
+          language={GuessLanguage(props.file)}
           theme="vs-dark"
           value={data}
           height="100%"

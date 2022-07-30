@@ -3,6 +3,7 @@ import { QueryClient, QueryClientProvider, useQuery } from '@tanstack/react-quer
 import { createSearchParams, useNavigate, useSearchParams, Link } from "react-router-dom";
 import './container.css'
 import './Search.css'
+import utils from './utils/utils';
 
 const queryClient = new QueryClient()
 
@@ -44,23 +45,12 @@ function QueryResults(props) {
 }
 
 function QueryResult(props) {
-    const normalizePath = path => path.replace(/[\\/]+/g, '/'); // TODO: Not sure why this is needed. Seems like a bug in db insertions.
-    const build_path = (...args) => {
-        return args.map((part, i) => {
-          if (i === 0) {
-            return part.trim().replace(/[\/]*$/g, '')
-          } else {
-            return part.trim().replace(/(^[\/]*|[\/]*$)/g, '')
-          }
-        }).filter(x=>x.length).join('/')
-    }
-    
-    const filePath = `${props.object.project}/${normalizePath(props.object.file_path)}/${props.object.file_name}`;
+    const filePath = `${props.object.project}/${utils.normalizePath(props.object.file_path)}/${props.object.file_name}`;
     let dataLines = (props.object.data).split('\n')
     dataLines.splice(5)
     return (
         <div className='search-result'>
-            <span>In <Link to={build_path("/browse/", filePath) + "?" + new URLSearchParams({query: props.query})}>{filePath}</Link></span><br />
+            <span>In <Link to={utils.buildPath("/browse/", filePath) + "?" + new URLSearchParams({query: props.query})}>{filePath}</Link></span><br />
             <span style={{whiteSpace: "pre-wrap"}}>
             {dataLines.join('\n')}
             </span>

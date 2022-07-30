@@ -1,4 +1,4 @@
-module newgrok
+module monocole
 
 go 1.18
 
@@ -17,10 +17,6 @@ replace internal/content_parser => ./internal/content_parser
 require internal/persistent_storage v0.0.0-00010101000000-000000000000
 
 replace internal/persistent_storage => ./internal/persistent_storage
-
-require internal/utils v0.0.0-00010101000000-000000000000
-
-replace internal/utils => ./internal/utils
 
 require (
 	github.com/go-chi/chi/v5 v5.0.7 // indirect

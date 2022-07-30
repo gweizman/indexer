@@ -108,6 +108,10 @@ func getDef(w http.ResponseWriter, r *http.Request, project string, path_limit s
 }
 
 func getDir(w http.ResponseWriter, r *http.Request, project string, path string, db *persistent_storage.Db) {
+	if path == "" {
+		path = "."
+	}
+
 	t, found, err := db.GetDirChildren(project, path)
 	if err != nil {
 		log.Panic(err)

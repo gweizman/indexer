@@ -42,7 +42,7 @@ func NewStorage(project string, basepath string, db Db) (*IndexStorage, error) {
 	_, err = session.Run(""+
 		"MATCH (p:Project) "+
 		"WHERE p.name = $project "+
-		"MERGE (f:Dir {path: $path})-[:BELONGS_TO]->(p)",
+		"MERGE (f:Dir {path: $path, project: $project})-[:BELONGS_TO]->(p)",
 		map[string]interface{}{"project": project, "path": "."},
 	)
 	if err != nil {

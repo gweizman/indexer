@@ -207,8 +207,6 @@ func (e *Db) GetFileContent(project string, path string) (string, bool, error) {
 		log.Panic(err)
 	}
 
-	log.Print(dir)
-	log.Print(file)
 	output, err := session.Run("MATCH (f:File)-[:CONTENT]->(c:Content) WHERE f.project = $project AND f.path = $path AND f.name = $name RETURN c.data AS data",
 		map[string]interface{}{"project": project, "path": filepath.Dir(path), "name": file, "dir": dir}) // TODO: Figure out how to include project in this index
 	if err != nil {
@@ -334,19 +332,24 @@ func (e *Db) GetDefinition(project string, path_limit string, name string) ([]*D
 }
 
 type DirOrFile struct {
-	Project string
-	Path    string
-	Name    string
-	IsDir   bool
+	Project string `json:"project"`
+	Path    string `json:"path"`
+	Name    string `json:"name"`
+	IsDir   bool   `json:"is_dir"`
 }
 
 func (e *Db) GetDirChildren(project string, path string) ([]*DirOrFile, bool, error) {
 	session := e.neo4jDriver.NewSession(neo4j.SessionConfig{AccessMode: neo4j.AccessModeWrite})
 	defer session.Close()
 
+	dir, err := filepath.Rel("./", path)
+	if err != nil {
+		log.Panic(err)
+	}
+
 	output, err := session.Run("MATCH (d:Dir)-[:CONTAINS]->(n) WHERE d.path = $path AND d.project = $project "+
 		"RETURN n.project AS project, labels(n) AS labels, n.name AS name, n.path AS path",
-		map[string]interface{}{"project": project, "path": path})
+		map[string]interface{}{"project": project, "path": dir})
 	if err != nil {
 		return []*DirOrFile{}, false, err
 	}

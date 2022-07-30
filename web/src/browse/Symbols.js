@@ -1,6 +1,7 @@
 import { QueryClient, QueryClientProvider, useQuery } from '@tanstack/react-query'
 import { useState } from 'react';
 import { createSearchParams, useNavigate, useSearchParams, Link } from "react-router-dom";
+import utils from '../utils/utils';
 
 import './Symbols.css';
 
@@ -53,29 +54,18 @@ function SymbolList(props) {
 }
 
 function Symbol(props) {
-    const normalizePath = path => path.replace(/[\\/]+/g, '/'); // TODO: Not sure why this is needed. Seems like a bug in db insertions.
-    const build_path = (...args) => {
-        return args.map((part, i) => {
-          if (i === 0) {
-            return part.trim().replace(/[\/]*$/g, '')
-          } else {
-            return part.trim().replace(/(^[\/]*|[\/]*$)/g, '')
-          }
-        }).filter(x=>x.length).join('/')
-    } // TODO: Code dupliaction
+  const filePath = utils.normalizePath(utils.buildPath(props.object.file_path, props.object.file_name)) // TODO: Not sure why this is needed. Seems like a bug in db insertions.
 
-    const filePath = normalizePath(build_path(props.object.file_path, props.object.file_name))
-
-    return (
-        <div>
-            <Link className="reset" to={`/browse/${props.object.project}/${filePath}`}>
-            <span>
-                {props.object.name} <span className="small">({filePath}:{props.object.line})</span>
-            </span>
-            </Link>
-            <br />
-        </div>
-    )
+  return (
+      <div>
+          <Link className="reset" to={`/browse/${props.object.project}/${filePath}`}>
+          <span>
+              {props.object.name} <span className="small">({filePath}:{props.object.line})</span>
+          </span>
+          </Link>
+          <br />
+      </div>
+  )
 }
 
 export default Symbols;
