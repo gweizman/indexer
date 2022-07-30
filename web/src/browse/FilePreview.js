@@ -3,7 +3,6 @@ import MonacoEditor from 'react-monaco-editor';
 
 function GuessLanguage(name) {
   const fileExt = name.toLowerCase().split('.').pop();
-  console.log(fileExt)
   switch (fileExt) {
     case "css":
       return "css"

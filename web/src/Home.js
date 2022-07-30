@@ -4,7 +4,7 @@ import ProjectBrowser from './browse/ProjectBrowser';
 function Home() {
     return (
       <div className="Home">
-        <h2>🔍 Monocole Indexer</h2>
+        <h2>🔍 Monocle Indexer</h2>
         <SearchBar />
         <div>
         <br />
