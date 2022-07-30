@@ -242,7 +242,8 @@ func (e *Db) SearchFileContent(project string, path_limit string, query string) 
 		"CALL db.index.fulltext.queryNodes(\"content_project_idx\", $query) YIELD node, score "+
 		"MATCH (f:File) "+
 		"WHERE (f:File)-[:CONTENT]->(node) AND node.project = $project AND f.project = $project "+
-		"RETURN node.data as data, node.project as project, node.version as version, f.name as fileName, f.path as filePath, score as score",
+		"RETURN node.data as data, node.project as project, node.version as version, f.name as fileName, f.path as filePath, score as score "+
+		"LIMIT 25",
 		map[string]interface{}{"project": project, "query": query})
 	if err != nil {
 		return []*FileContent{}, false, err
@@ -291,7 +292,8 @@ func (e *Db) GetDefinition(project string, path_limit string, name string) ([]*D
 	defer session.Close()
 
 	output, err := session.Run("MATCH (n:Definition)<-[:DEFINES]-(f:File) WHERE n.project = $project AND n.name =~ $name RETURN n.project as project, n.name as name, "+
-		"n.language as language, n.pattern as pattern, n.signature as signature, n.fileLimited as fileLimited, n.parent as parent, n.parentKind as parentKind, n.line as line, f.name as fileName, f.path as filePath",
+		"n.language as language, n.pattern as pattern, n.signature as signature, n.fileLimited as fileLimited, n.parent as parent, n.parentKind as parentKind, n.line as line, f.name as fileName, f.path as filePath "+
+		"LIMIT 25",
 		map[string]interface{}{"project": project, "name": name})
 	if err != nil {
 		return []*Definition{}, false, err
@@ -325,6 +327,56 @@ func (e *Db) GetDefinition(project string, path_limit string, name string) ([]*D
 			FileName:    fileName.(string),
 			FilePath:    filePath.(string),
 			Line:        uint(line.(int64)), // TODO: Fix, should be unsigned @ db
+		})
+	}
+
+	return results, true, nil
+}
+
+type DirOrFile struct {
+	Project string
+	Path    string
+	Name    string
+	IsDir   bool
+}
+
+func (e *Db) GetDirChildren(project string, path string) ([]*DirOrFile, bool, error) {
+	session := e.neo4jDriver.NewSession(neo4j.SessionConfig{AccessMode: neo4j.AccessModeWrite})
+	defer session.Close()
+
+	output, err := session.Run("MATCH (d:Dir)-[:CONTAINS]->(n) WHERE d.path = $path AND d.project = $project "+
+		"RETURN n.project AS project, labels(n) AS labels, n.name AS name, n.path AS path",
+		map[string]interface{}{"project": project, "path": path})
+	if err != nil {
+		return []*DirOrFile{}, false, err
+	}
+
+	var results []*DirOrFile
+	for output.Next() {
+		record := output.Record()
+
+		project, _ := record.Get("project")
+		name, _ := record.Get("name")
+		path, _ := record.Get("path")
+		objtype, _ := record.Get("labels")
+		isDir := false
+
+		for _, t := range objtype.([]interface{}) {
+			if t.(string) == "Dir" {
+				isDir = true
+			}
+		}
+
+		strname := ""
+		if name != nil {
+			strname = name.(string)
+		}
+
+		results = append(results, &DirOrFile{
+			Project: project.(string),
+			Name:    strname,
+			Path:    path.(string),
+			IsDir:   isDir,
 		})
 	}
 

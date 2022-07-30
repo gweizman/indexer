@@ -28,6 +28,8 @@ func addProject(dir string, name string, db persistent_storage.Db) {
 }
 
 func main() {
+	log.SetFlags(log.LstdFlags | log.Lshortfile)
+
 	start := time.Now()
 	initSchema := flag.Bool("initSchema", false, "Init the schemas")
 	indexProject := flag.Bool("indexProject", false, "Index the project") // TODO: Also add a flag for project path/etc.

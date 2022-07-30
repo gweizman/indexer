@@ -53,7 +53,8 @@ function QueryResult(props) {
             return part.trim().replace(/(^[\/]*|[\/]*$)/g, '')
           }
         }).filter(x=>x.length).join('/')
-      }
+    }
+    
     const filePath = `${props.object.project}/${normalizePath(props.object.file_path)}/${props.object.file_name}`;
     let dataLines = (props.object.data).split('\n')
     dataLines.splice(5)

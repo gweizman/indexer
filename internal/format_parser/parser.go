@@ -45,6 +45,7 @@ func tika(filename string, content []byte) []byte {
 func worker(storage *persistent_storage.IndexStorage, files chan string, results chan persistent_storage.StoredFile, done chan int) {
 	for file_name := range files {
 		func() {
+			log.Printf("File: %s", file_name)
 			fileObject, err := storage.CreateFile(file_name)
 			if err != nil {
 				log.Panic(err)
