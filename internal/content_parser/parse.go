@@ -8,10 +8,10 @@ import (
 func worker(contents chan persistent_storage.StoredFile, done chan int) {
 	for file := range contents {
 		for _, content := range file.Content {
-			data, canBeCode := content.Data, content.CanBeCode
+			data, canBeCode := content.Data, true
 			if canBeCode {
 				for _, content_parser := range content_parsers {
-					err := content_parser(file, data)
+					err := content_parser(file, []byte(data))
 					if err != nil {
 						log.Print(err)
 					}

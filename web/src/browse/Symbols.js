@@ -11,7 +11,7 @@ function Symbols() {
         <div className="SymbolBrowser">
             <strong>Project Symbols</strong>
             <SearchBox value={searchValue} setValue={setSearchValue} />
-            <SymbolList project="test_project" query={searchValue} />
+            <SymbolList project="OpenGrok" query={searchValue} />
         </div>
     )
 }

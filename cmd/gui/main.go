@@ -17,7 +17,6 @@ func getFile(w http.ResponseWriter, r *http.Request, project string, file string
 	if err != nil {
 		log.Panic(err)
 	}
-	log.Print(t)
 
 	if !found {
 		http.Error(w, http.StatusText(404), 404)
@@ -34,11 +33,11 @@ type SearchResponse struct {
 	*persistent_storage.FileContent
 }
 
-func (k *DefinitionResponse) Render(w http.ResponseWriter, r *http.Request) error {
+func (k DefinitionResponse) Render(w http.ResponseWriter, r *http.Request) error {
 	return nil
 }
 
-func (k *SearchResponse) Render(w http.ResponseWriter, r *http.Request) error {
+func (k SearchResponse) Render(w http.ResponseWriter, r *http.Request) error {
 	return nil
 }
 
@@ -55,7 +54,7 @@ func getDef(w http.ResponseWriter, r *http.Request, project string, path_limit s
 
 	list := []render.Renderer{}
 	for _, def := range t {
-		list = append(list, &DefinitionResponse{Definition: &def})
+		list = append(list, &DefinitionResponse{Definition: def})
 	}
 
 	render.RenderList(w, r, list)
@@ -74,7 +73,7 @@ func textSearch(w http.ResponseWriter, r *http.Request, project string, path_lim
 
 	list := []render.Renderer{}
 	for _, val := range t {
-		list = append(list, &SearchResponse{FileContent: &val})
+		list = append(list, &SearchResponse{FileContent: val})
 	}
 
 	render.RenderList(w, r, list)

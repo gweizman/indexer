@@ -235,7 +235,7 @@ type FileContent struct {
 
 // TODO: Don't ignore path_limit
 // TODO: Maybe should be the same function as GetFileContent
-func (e *Db) SearchFileContent(project string, path_limit string, query string) ([]FileContent, bool, error) {
+func (e *Db) SearchFileContent(project string, path_limit string, query string) ([]*FileContent, bool, error) {
 	session := e.neo4jDriver.NewSession(neo4j.SessionConfig{AccessMode: neo4j.AccessModeWrite})
 	defer session.Close()
 	output, err := session.Run(""+
@@ -245,10 +245,10 @@ func (e *Db) SearchFileContent(project string, path_limit string, query string) 
 		"RETURN node.data as data, node.project as project, node.version as version, f.name as fileName, f.path as filePath, score as score",
 		map[string]interface{}{"project": project, "query": query})
 	if err != nil {
-		return []FileContent{}, false, err
+		return []*FileContent{}, false, err
 	}
 
-	var results []FileContent
+	var results []*FileContent
 	for output.Next() {
 		record := output.Record()
 
@@ -259,7 +259,7 @@ func (e *Db) SearchFileContent(project string, path_limit string, query string) 
 		data, _ := record.Get("data")
 		score, _ := record.Get("score")
 
-		results = append(results, FileContent{
+		results = append(results, &FileContent{
 			Project:  project.(string),
 			Version:  version.(string),
 			FileName: fileName.(string),
@@ -286,7 +286,7 @@ type Definition struct {
 	Line        uint   `json:"line"`
 }
 
-func (e *Db) GetDefinition(project string, path_limit string, name string) ([]Definition, bool, error) { // TODO: Don't ignore path_limit
+func (e *Db) GetDefinition(project string, path_limit string, name string) ([]*Definition, bool, error) { // TODO: Don't ignore path_limit
 	session := e.neo4jDriver.NewSession(neo4j.SessionConfig{AccessMode: neo4j.AccessModeWrite})
 	defer session.Close()
 
@@ -294,10 +294,10 @@ func (e *Db) GetDefinition(project string, path_limit string, name string) ([]De
 		"n.language as language, n.pattern as pattern, n.signature as signature, n.fileLimited as fileLimited, n.parent as parent, n.parentKind as parentKind, n.line as line, f.name as fileName, f.path as filePath",
 		map[string]interface{}{"project": project, "name": name})
 	if err != nil {
-		return []Definition{}, false, err
+		return []*Definition{}, false, err
 	}
 
-	var results []Definition
+	var results []*Definition
 	for output.Next() {
 		record := output.Record()
 
@@ -313,7 +313,7 @@ func (e *Db) GetDefinition(project string, path_limit string, name string) ([]De
 		filePath, _ := record.Get("filePath")
 		line, _ := record.Get("line")
 
-		results = append(results, Definition{
+		results = append(results, &Definition{
 			Project:     project.(string),
 			Name:        name.(string),
 			Language:    language.(string),

@@ -110,18 +110,16 @@ func (f *StoredFile) AddContentVersion(content []byte, version string) error {
 	session := f.Idx.db.neo4jDriver.NewSession(neo4j.SessionConfig{AccessMode: neo4j.AccessModeWrite})
 	defer session.Close()
 
-	content_to_print := ""
-	if len(content) > 10 {
-		content_to_print = string(content[:10])
-	} else {
-		content_to_print = string(content)
-	}
-	log.Printf("%s %s %s", f.Path, f.Name, content_to_print)
-
-	// f.Content[version] = FileContent{
-	// 	Data:      content,
-	// 	CanBeCode: true,
+	// content_to_print := ""
+	// if len(content) > 10 {
+	// 	content_to_print = string(content[:10])
+	// } else {
+	// 	content_to_print = string(content)
 	// }
+
+	f.Content[version] = FileContent{
+		Data: string(content),
+	}
 
 	_, err := session.Run(""+
 		"MATCH (f:File) "+
@@ -153,6 +151,6 @@ func (f *StoredFile) InsertDefinition(name string, line int, kind string, langua
 		return err
 	}
 
-	log.Printf("%s: %s %d %s %s %s %s %s %s %t", filepath.Join(f.Path, f.Name), name, line, kind, language, parent, parentKind, pattern, signature, fileLimited)
+	log.Printf("DEF %s: %s %d %s %s %s %s %s %s %t", filepath.Join(f.Path, f.Name), name, line, kind, language, parent, parentKind, pattern, signature, fileLimited)
 	return nil
 }

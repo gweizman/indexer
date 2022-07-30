@@ -26,7 +26,7 @@ function Search() {
 
 function QueryResults(props) {
     let { isLoading, error, data } = useQuery(['searchResults', props.query], () =>
-        fetch('/api/test_project/search/?' + new URLSearchParams({
+        fetch('/api/OpenGrok/search/?' + new URLSearchParams({
             query: props.query
         })).then(res =>
             res.json()

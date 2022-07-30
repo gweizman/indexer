@@ -31,6 +31,9 @@ func main() {
 	start := time.Now()
 	initSchema := flag.Bool("initSchema", false, "Init the schemas")
 	indexProject := flag.Bool("indexProject", false, "Index the project") // TODO: Also add a flag for project path/etc.
+
+	projectPath := flag.String("path", "D:\\Work\\OpenGrok", "Project path")
+	projectName := flag.String("name", "OpenGrok", "Project name")
 	flag.Parse()
 
 	db, err := persistent_storage.CreateDb()
@@ -46,7 +49,7 @@ func main() {
 		}
 	}
 	if *indexProject {
-		addProject("D:\\Work\\hellogitworld", "test_project", *db)
+		addProject(*projectPath, *projectName, *db)
 	}
 
 	elapsed := time.Since(start)
